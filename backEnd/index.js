@@ -17,7 +17,6 @@ CLIENT_URL ||'http://localhost:5173'
 
 ];
 
-// ✅ Apply proper CORS config
 app.use(cors({
   origin: function (origin, callback) {
     if (!origin || allowedOrigins.includes(origin)) {

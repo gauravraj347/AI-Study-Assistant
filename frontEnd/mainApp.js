@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react"
 import { useDispatch, useSelector } from "react-redux";
+import { logout } from "./store/slices/authSlice";
 import Auth from "./components/authentication/auth.js"
 import NotesForm from "./components/studySession/notesForm.js"
 import Results from "./components/quizSystem/results.js"
@@ -11,8 +12,10 @@ export default function Application() {
     const [activeTab, setActiveTab] = useState("study");
     const { user } = useSelector((state) => state.auth);
 
+    const dispatch = useDispatch();
+    
     const handleLogout = () => {
-        localStorage.removeItem("user");
+        dispatch(logout());
         setResult(null);
         setActiveTab("study");
     }
