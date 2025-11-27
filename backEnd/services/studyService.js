@@ -1,13 +1,16 @@
 import StudySession from "../models/studySession.js";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import dotenv from 'dotenv';
-dotenv.config(); 
+dotenv.config();
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
-const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+const model = genAI.getGenerativeModel({ 
+    model: "gemini-2.0-flash"
+});
 
 export const generateStudyMaterial = async (text, userId) => {
+  try {
     const prompt = `
 Summarize the following notes and create a practice quiz.
 Return ONLY valid JSON (no markdown, no extra text).
@@ -35,23 +38,26 @@ ${text}
 
     let parsed;
     try {
-        parsed = JSON.parse(output);
-    } catch (e) {
-        throw new Error("AI response was not valid JSON");
+      parsed = JSON.parse(output);
+    } catch {
+      throw new Error("AI response was not valid JSON");
     }
 
     const studySession = await StudySession.create({
-        user: userId,
-        inputText: text,
-        summary: parsed.summary,
-        quiz: parsed.quiz,
+      user: userId,
+      inputText: text,
+      summary: parsed.summary,
+      quiz: parsed.quiz,
     });
 
     return studySession;
+  } catch (error) {
+    throw error;
+  }
 };
 
 export const getStudyHistory = async (userId) => {
-    return await StudySession.find({ user: userId })
-        .sort({ createdAt: -1 })
-        .limit(10);
+  return await StudySession.find({ user: userId })
+    .sort({ createdAt: -1 })
+    .limit(10);
 };
